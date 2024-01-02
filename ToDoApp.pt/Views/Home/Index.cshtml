@@ -1,0 +1,77 @@
+﻿@model IEnumerable<ToDo>
+
+<div class="row">
+    <div class="col-md-2">
+        <form asp-action="Filtro" method="post">
+            <div class="mb-3">
+                <label class="form-label">Categoria</label>
+                <select name="filtro" class="form-select"
+                        asp-items="@(new SelectList(ViewBag.Categorias, "CategoriaId", "Nome", ViewBag.Filtros.CategoriaId))">
+                    <option value="todos">Todos</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Previsao</label>
+                <select name="filtro" class="form-select"
+                        asp-items="@(new SelectList( ViewBag.FiltrosPrevisao, "Key", "Value", ViewBag.Filtros.Previsao))">
+                    <option value="todos">Todos</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Status</label>
+                <select name="filtro" class="form-select"
+                        asp-items="@(new SelectList(ViewBag.Situacoes, "SituacaoId", "Nome", ViewBag.Filtros.SituacaoId))">
+                    <option value="todos">Todos</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+            <a asp-action="Index" asp-route-id="" class="btn btn-primary">Limpar</a>
+        </form>
+    </div>
+    <div class="col-md-10">
+        <form asp-action="Realizado" method="post" asp-route-id="@ViewBag.Filtros.FiltroString">
+            <table class="table table-borderd table-striped mt-2">
+                <thead>
+                    <tr>
+                        <th>Descrição</th>
+                        <th>Categoria</th>
+                        <th>Data de Vencimento</th>
+                        <th>Situação</th>
+                        <th class="w-25"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (ToDo tarefas in Model)
+                    {
+                        string atrasado = tarefas.Atrasado ? "bg-warning" : "";
+                        <tr>
+                            <td>@tarefas.Descricao</td>
+                            <td>@tarefas.Categoria.Nome</td>
+                            <td class="@atrasado">@tarefas.Vencimento?.ToShortDateString()</td>
+                            <td class="@atrasado">@tarefas.Situacao.Nome</td>
+                            <td>
+                                @if (tarefas.SituacaoId == "aberto")
+                                {
+                                    <button type="submit" class="btn btn-primary btn-sm"
+                                            name="@nameof(ToDo.Id)" value="@tarefas.Id">
+                                        Realizado
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </form>
+
+        <form asp-action="DeleteRealizado" method="post" asp-route-id="@ViewBag.Filtros.FiltroString">
+            <a asp-action="Adicionar" class="btn btn-primary">Adicionar tarefa</a>
+            <button type="submit" class="btn btn-danger">Apagar tarefas realizadas</button>
+
+        </form>
+    </div>
+</div>
+
